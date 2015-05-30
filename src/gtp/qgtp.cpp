@@ -87,6 +87,14 @@ int QGtp::openGtpSession(QString filename, int size, float komi, int handicap, i
 		arguments << "--19" << "--dontDisplay" << "1" ;
 
 	}
+        if (filename.toLower().contains(" "))
+        {
+                QStringList command_list = filename.split(" ");
+                filename = command_list.at(0);
+                for (int i = 1; i < command_list.size(); ++i)
+                        arguments << command_list.at(i);
+        }
+
 
 
 	connect(programProcess, SIGNAL(readyRead()),
@@ -198,13 +206,12 @@ void QGtp::slot_readFromStdout()
 	else
 		_response = _response.right(_response.length() - pos - 1);
 
-    int i = moveRequests.indexOf(number);
-    if (i == -1)
+    if (moveRequests.length() < 1)
         return;
     // Otherwise we have an answer to a move request.
     // This is the one case in which we currently do not busy-wait.
     busy=false;
-    moveRequests.removeAt(i);
+    moveRequests.removeLast();
 
     if (_response == "resign")
     {
